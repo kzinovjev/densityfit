@@ -63,8 +63,7 @@ def bin_to_x(bin_mids, b):
     return [bin_mids[i_bin] for i_bin in enumerate(b)]
 
 
-def fit_density(data, centers, bins=10, thr=0):
-    hist, edges = np.histogramdd(data, bins)
+def fit_histogram(hist, edges, centers, thr=0):
     edges = np.array(edges)
     bin_mids = (edges[:, :-1] + edges[:, 1:]) / 2
 
@@ -87,13 +86,17 @@ def fit_density(data, centers, bins=10, thr=0):
                                   ydata=vals,
                                   p0=guess,
                                   bounds=(l_bounds, np.inf))
-    #     return final_params, cov
 
     fit = np.zeros(hist.shape)
     for index in np.ndindex(*hist.shape):
         fit[index] = f(np.array([bin_to_x(bin_mids, index)]), *final_params)
 
     return final_params, cov, bin_mids, fit
+
+
+def fit_sample(data, centers, bins=10, thr=0):
+    hist, edges = np.histogramdd(data, bins)
+    return fit_histogram(hist, edges, centers, thr)
 
 
 def arg_to_data(arg, d):
@@ -114,7 +117,7 @@ def main():
 
     n_bins = int(sys.argv[3]) if len(sys.argv) > 3 else 30
 
-    final_params, cov, bin_mids, fit = fit_density(data, centers, n_bins)
+    final_params, cov, bin_mids, fit = fit_sample(data, centers, n_bins)
 
     n_params = len(final_params) // len(centers)
     params = final_params.reshape((len(centers), n_params))
