@@ -106,17 +106,28 @@ def arg_to_data(arg, d):
 
 
 def main():
-    import sys
+    import argparse
     import matplotlib.pyplot as plt
 
-    with open(sys.argv[1], 'r') as f:
+    parser = argparse.ArgumentParser(
+        description="Fits a set of multivariate gaussians to a data sample"
+    )
+    parser.add_argument("data_file",
+                        help="Data file with each row being a single data point")
+    parser.add_argument("centers",
+                        help="Initial guess consisting of comma separated "
+                             "coordinates for centers of the gaussians")
+    parser.add_argument("bins", type=int, help="Number of bins", nargs='?')
+    args = parser.parse_args()
+
+    with open(args.data_file, 'r') as f:
         raw_data = [[float(x) for x in line.split()] for line in f]
     data = tuple(np.array(raw_data).T)
 
     d = len(data)
-    centers = arg_to_data(sys.argv[2], d)
+    centers = arg_to_data(args.centers, d)
 
-    n_bins = int(sys.argv[3]) if len(sys.argv) > 3 else 30
+    n_bins = int(args.bins) if args.bins else 30
 
     final_params, cov, bin_mids, fit = fit_sample(data, centers, n_bins)
 
