@@ -96,7 +96,7 @@ def fit_histogram(hist, edges, centers, thr=0):
 
 
 def fit_sample(data, centers, bins=10, thr=0):
-    hist, edges = np.histogramdd(data, bins)
+    hist, edges = np.histogramdd(data, bins, density=True)
     return fit_histogram(hist, edges, centers, thr)
 
 
@@ -140,7 +140,7 @@ def main():
 
     fig, ax = plt.subplots()
     if d == 1:
-        ax.hist(data[0], bins=n_bins)
+        ax.hist(data[0], bins=n_bins, density=True)
         ax.plot(bin_mids[0], fit)
         ax.scatter(params[:, 1], params[:, 0], marker='o', c="red", zorder=10)
     if d == 2:
